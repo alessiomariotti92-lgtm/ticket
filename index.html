@@ -1,376 +1,368 @@
 <!DOCTYPE html>
+
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="ANYBYTE Ticket">
-<title>ANYBYTE Ticket</title>
-<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj48cmVjdCB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgcng9IjQwIiBmaWxsPSIjMkI3RkU4Ii8+PHRleHQgeD0iOTAiIHk9IjEwNSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjcwIiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkFCPC90ZXh0Pjwvc3ZnPg==">
+<meta name="apple-mobile-web-app-title" content="ANYBYTE Ops">
+<title>ANYBYTE Ops</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap');
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  :root {
-    --navy: #2B7FE8; --cyan: #00C2FF; --dark: #0f1219; --card: #1a1f2e;
-    --card2: #212738; --border: #2a3040; --text: #e8ecf4; --muted: #6b7694;
-    --success: #34d399; --error: #f87171;
-  }
-  body {
-    font-family: 'DM Sans', -apple-system, sans-serif;
-    background: var(--dark); color: var(--text);
-    min-height: 100dvh; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0;
-    overflow-x: hidden;
-  }
-
-  /* PIN SCREEN */
-  .pin-screen {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    min-height: 100dvh; padding: 24px;
-    background: radial-gradient(ellipse at 20% 50%, rgba(43,127,232,0.08) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 50%, rgba(0,194,255,0.06) 0%, transparent 50%), var(--dark);
-  }
-  .pin-logo {
-    width: 64px; height: 64px; background: linear-gradient(135deg, var(--navy), var(--cyan));
-    border-radius: 18px; display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 22px; color: white; margin-bottom: 24px;
-    box-shadow: 0 8px 32px rgba(43,127,232,0.3);
-  }
-  .pin-title { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
-  .pin-subtitle { font-size: 14px; color: var(--muted); margin-bottom: 32px; }
-  .pin-dots { display: flex; gap: 16px; margin-bottom: 36px; }
-  .pin-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--border); transition: all 0.2s; }
-  .pin-dot.filled { background: var(--cyan); border-color: var(--cyan); box-shadow: 0 0 12px rgba(0,194,255,0.4); }
-  .pin-dot.error { border-color: var(--error); background: var(--error); animation: shake 0.4s ease; }
-  .pin-pad { display: grid; grid-template-columns: repeat(3, 72px); gap: 12px; }
-  .pin-key {
-    width: 72px; height: 56px; background: var(--card); border: 1px solid var(--border);
-    border-radius: 14px; color: var(--text); font-family: 'JetBrains Mono', monospace;
-    font-size: 22px; font-weight: 500; display: flex; align-items: center; justify-content: center;
-    cursor: pointer; transition: all 0.15s; -webkit-user-select: none; user-select: none;
-  }
-  .pin-key:active { background: var(--navy); border-color: var(--navy); transform: scale(0.93); }
-  .pin-key.fn { font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--muted); background: transparent; border-color: transparent; }
-  .pin-key.fn:active { color: var(--text); background: var(--card); }
-
-  /* APP SCREEN */
-  .app-screen { display: none; flex-direction: column; min-height: 100dvh; }
-  .app-header {
-    display: flex; align-items: center; gap: 10px; padding: 16px 20px;
-    background: var(--card); border-bottom: 1px solid var(--border);
-  }
-  .app-header-logo {
-    width: 32px; height: 32px; background: linear-gradient(135deg, var(--navy), var(--cyan));
-    border-radius: 9px; display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 12px; color: white;
-  }
-  .app-header h1 { font-size: 17px; font-weight: 700; }
-  .app-body { flex: 1; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
-
-  .upload-zone {
-    position: relative; border: 2px dashed var(--border); border-radius: 16px;
-    padding: 32px 16px; display: flex; flex-direction: column; align-items: center;
-    justify-content: center; gap: 12px; cursor: pointer; transition: all 0.25s;
-    background: var(--card); min-height: 180px; overflow: hidden;
-  }
-  .upload-zone:active { border-color: var(--navy); background: rgba(43,127,232,0.05); }
-  .upload-zone.has-image { padding: 0; border-style: solid; border-color: var(--navy); }
-  .upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-  .upload-icon { font-size: 40px; opacity: 0.7; }
-  .upload-text { font-size: 15px; color: var(--muted); text-align: center; }
-  .upload-text strong { color: var(--cyan); }
-  .preview-img { display: none; width: 100%; max-height: 280px; object-fit: contain; border-radius: 14px; }
-  .upload-zone.has-image .upload-icon, .upload-zone.has-image .upload-text { display: none; }
-  .upload-zone.has-image .preview-img { display: block; }
-  .remove-img {
-    display: none; position: absolute; top: 8px; right: 8px; width: 32px; height: 32px;
-    background: rgba(0,0,0,0.7); border: none; border-radius: 50%; color: white; font-size: 18px; cursor: pointer; z-index: 2;
-  }
-  .upload-zone.has-image .remove-img { display: flex; align-items: center; justify-content: center; }
-
-  .field-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; }
-  .field-card label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; display: block; margin-bottom: 8px; }
-  .priority-row { display: flex; gap: 8px; }
-  .priority-btn {
-    flex: 1; padding: 10px 0; background: var(--dark); border: 1px solid var(--border);
-    border-radius: 10px; color: var(--muted); font-family: 'DM Sans', sans-serif;
-    font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: center;
-  }
-  .priority-btn.active { color: white; border-color: transparent; }
-  .priority-btn[data-p="low"].active { background: #166534; }
-  .priority-btn[data-p="medium"].active { background: #854d0e; }
-  .priority-btn[data-p="high"].active { background: #c2410c; }
-  .priority-btn[data-p="critical"].active { background: #dc2626; }
-
-  .note-input {
-    width: 100%; padding: 12px; background: var(--dark); border: 1px solid var(--border);
-    border-radius: 10px; color: var(--text); font-family: 'DM Sans', sans-serif;
-    font-size: 14px; resize: none; outline: none; min-height: 60px;
-  }
-  .note-input::placeholder { color: var(--muted); opacity: 0.5; }
-  .note-input:focus { border-color: var(--navy); }
-
-  .submit-btn {
-    width: 100%; padding: 16px; background: linear-gradient(135deg, var(--navy), var(--cyan));
-    border: none; border-radius: 14px; color: white; font-family: 'DM Sans', sans-serif;
-    font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.15s;
-    display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: auto;
-  }
-  .submit-btn:active { transform: scale(0.97); }
-  .submit-btn:disabled { opacity: 0.4; }
-  .submit-btn .spinner { display: none; width: 20px; height: 20px; border: 2.5px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; }
-  .submit-btn.loading .btn-label { display: none; }
-  .submit-btn.loading .spinner { display: block; }
-  .submit-btn.loading .btn-status { display: block; }
-  .btn-status { display: none; font-size: 14px; font-weight: 500; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* RESULT SCREEN */
-  .result-screen {
-    display: none; flex-direction: column; align-items: center; justify-content: center;
-    min-height: 100dvh; padding: 32px 24px; text-align: center;
-    background: radial-gradient(ellipse at 50% 30%, rgba(52,211,153,0.06) 0%, transparent 50%), var(--dark);
-  }
-  .result-screen.error-state { background: radial-gradient(ellipse at 50% 30%, rgba(248,113,113,0.06) 0%, transparent 50%), var(--dark); }
-  .result-check {
-    width: 72px; height: 72px; border-radius: 50%; background: rgba(52,211,153,0.12);
-    display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: 20px;
-    animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-  .error-state .result-check { background: rgba(248,113,113,0.12); }
-  @keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
-  .result-ticket {
-    font-family: 'JetBrains Mono', monospace; font-size: 32px; font-weight: 700;
-    background: linear-gradient(135deg, var(--navy), var(--cyan));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 8px 0 4px;
-  }
-  .result-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
-  .result-detail { color: var(--muted); font-size: 14px; line-height: 1.5; max-width: 300px; }
-  .result-meta {
-    margin-top: 20px; background: var(--card); border: 1px solid var(--border);
-    border-radius: 14px; padding: 16px 20px; width: 100%; max-width: 320px;
-    text-align: left; display: flex; flex-direction: column; gap: 8px;
-  }
-  .meta-row { display: flex; justify-content: space-between; font-size: 13px; }
-  .meta-row .meta-label { color: var(--muted); }
-  .meta-row .meta-value { font-weight: 600; }
-  .new-ticket-btn {
-    margin-top: 24px; padding: 14px 40px; background: var(--card); border: 1px solid var(--border);
-    border-radius: 12px; color: var(--text); font-family: 'DM Sans', sans-serif;
-    font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.15s;
-  }
-  .new-ticket-btn:active { background: var(--card2); transform: scale(0.97); }
-
-  @keyframes shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-8px); } 40% { transform: translateX(8px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(5px); } }
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--nv:#2B7FE8;--cy:#00C2FF;--dk:#0c0f16;--cd:#161b27;--cd2:#1c2233;--bd:#252d40;--tx:#e4e9f2;--mt:#5e6a82;--ok:#2dd4a0;--er:#ef5350;--wn:#f59e0b}
+body{font-family:'DM Sans',sans-serif;background:var(--dk);color:var(--tx);min-height:100dvh;overflow-x:hidden}
+.scr{display:none;flex-direction:column;min-height:100dvh}.scr.on{display:flex}
+.hdr{display:flex;align-items:center;gap:10px;padding:14px 18px;background:var(--cd);border-bottom:1px solid var(--bd)}
+.logo{width:30px;height:30px;background:linear-gradient(135deg,var(--nv),var(--cy));border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:#fff;flex-shrink:0}
+.hdr h1{font-size:15px;font-weight:700;flex:1}
+.bk{width:32px;height:32px;background:var(--cd2);border:1px solid var(--bd);border-radius:8px;color:var(--tx);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.bdy{flex:1;padding:14px 18px;display:flex;flex-direction:column;gap:10px;padding-bottom:90px;overflow-y:auto}
+.crd{background:var(--cd);border:1px solid var(--bd);border-radius:14px;padding:14px 15px}
+.lbl{font-size:11px;font-weight:600;color:var(--mt);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:block}
+.inp{width:100%;padding:11px;background:var(--dk);border:1px solid var(--bd);border-radius:9px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:14px;outline:none}
+.inp:focus{border-color:var(--nv)}.inp::placeholder{color:var(--mt);opacity:.5}
+textarea.inp{resize:none;min-height:56px}
+.btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--nv),var(--cy));border:none;border-radius:13px;color:#fff;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer}
+.btn:disabled{opacity:.35}.btn:active:not(:disabled){transform:scale(.97)}
+.btn2{padding:10px 20px;background:var(--cd);border:1px solid var(--bd);border-radius:10px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer}
+.btn2:active{background:var(--cd2)}
+.fix{position:fixed;bottom:0;left:0;right:0;padding:12px 18px;padding-bottom:max(12px,env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--dk) 30%);z-index:10}
+.bdg{padding:3px 9px;border-radius:6px;font-size:10px;font-weight:700;color:#fff;display:inline-block}
+.mc{background:var(--cd);border:1px solid var(--bd);border-radius:14px;padding:15px 14px;display:flex;align-items:center;gap:12px;cursor:pointer}
+.mc:active{background:var(--cd2);transform:scale(.98)}
+.mi{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.mc h3{font-size:14px;font-weight:600;margin-bottom:2px}.mc p{font-size:11px;color:var(--mt);line-height:1.3}
+.st{background:var(--cd);border:1px solid var(--bd);border-radius:13px;padding:14px 12px;text-align:center;flex:1}
+.st .n{font-size:26px;font-weight:700}.st .l{font-size:10px;color:var(--mt);margin-top:2px;text-transform:uppercase;letter-spacing:.4px}
+.uz{position:relative;border:2px dashed var(--bd);border-radius:14px;padding:28px 14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;background:var(--cd);min-height:150px;overflow:hidden}
+.uz.has{padding:0;border-style:solid;border-color:var(--nv)}.uz.has .uzp{display:none}.uz.has .prv{display:block}.uz.has .rmb{display:flex}
+.uz input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.prv{display:none;width:100%;max-height:250px;object-fit:contain;border-radius:12px}
+.rmb{display:none;position:absolute;top:6px;right:6px;width:28px;height:28px;background:rgba(0,0,0,.7);border:none;border-radius:50%;color:#fff;font-size:14px;cursor:pointer;align-items:center;justify-content:center;z-index:2}
+.pr{display:flex;gap:6px}.pb{flex:1;padding:9px 0;background:var(--dk);border:1px solid var(--bd);border-radius:9px;color:var(--mt);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;cursor:pointer;text-align:center}
+.pb.on{color:#fff;border-color:transparent}
+.pb[data-p=low].on{background:#166534}.pb[data-p=medium].on{background:#854d0e}.pb[data-p=high].on{background:#c2410c}.pb[data-p=critical].on{background:#dc2626}
+.fltr{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;flex-wrap:nowrap}
+.fltr button{white-space:nowrap}
+.tl-item{display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:8px}
+.tl-item .info{flex:1;min-width:0}.tl-item .info h4{font-size:13px;font-weight:600;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tl-item .info span{font-size:11px;color:var(--mt)}
+.tl-item .badges{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.tmr{font-family:'JetBrains Mono',monospace;font-size:52px;font-weight:700;margin:30px 0;text-align:center}
+.rl .ri{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 14px}
+.rl .rt{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;background:linear-gradient(135deg,var(--nv),var(--cy));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:6px 0}
+.note-item{margin-bottom:8px;position:relative}
+.note-item .del{position:absolute;top:8px;right:8px;background:none;border:none;color:var(--mt);font-size:14px;cursor:pointer}
+.contact-item{display:flex;align-items:center;gap:12px;margin-bottom:8px;cursor:pointer}
+.contact-item .avatar{width:40px;height:40px;border-radius:50%;background:var(--nv);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;flex-shrink:0}
+.contact-item .cinfo{flex:1;min-width:0}.contact-item .cinfo h4{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.contact-item .cinfo span{font-size:11px;color:var(--mt)}
+.contact-item .cbtns{display:flex;gap:6px;flex-shrink:0}
+.contact-item .cbtns a{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;text-decoration:none;background:var(--dk);border:1px solid var(--bd)}
+.quote-line{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.quote-line input{flex:1}
+.quote-line .ql-del{width:32px;height:32px;background:none;border:1px solid var(--bd);border-radius:8px;color:var(--er);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}}
+@keyframes pop{0%{transform:scale(0)}100%{transform:scale(1)}}
+.pin-scr{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100dvh;padding:24px;background:radial-gradient(ellipse at 30% 40%,rgba(43,127,232,.07),transparent 60%),var(--dk)}
+.pd{display:flex;gap:14px;margin-bottom:32px}.dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--bd);transition:.2s}
+.dot.on{background:var(--cy);border-color:var(--cy);box-shadow:0 0 10px rgba(0,194,255,.4)}
+.kpd{display:grid;grid-template-columns:repeat(3,68px);gap:10px}
+.pk{width:68px;height:52px;background:var(--cd);border:1px solid var(--bd);border-radius:13px;color:var(--tx);font-family:'JetBrains Mono',monospace;font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;-webkit-user-select:none}
+.pk:active{background:var(--nv);border-color:var(--nv);transform:scale(.93)}
+.pk.fn{font-size:13px;font-family:'DM Sans',sans-serif;color:var(--mt);background:transparent;border-color:transparent}.pk.fn:active{color:var(--tx);background:var(--cd)}
+.empty{text-align:center;padding:40px 20px;color:var(--mt)}.empty .ei{font-size:40px;margin-bottom:8px;opacity:.5}.empty .et{font-size:13px;white-space:pre-line}
 </style>
 </head>
 <body>
 
-<!-- PIN SCREEN -->
-<div class="pin-screen" id="pinScreen">
-  <div class="pin-logo">AB</div>
-  <div class="pin-title">ANYBYTE Ticket</div>
-  <div class="pin-subtitle">Inserisci il PIN per accedere</div>
-  <div class="pin-dots" id="pinDots">
-    <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
-  </div>
-  <div class="pin-pad">
-    <div class="pin-key" onclick="pinPress('1')">1</div>
-    <div class="pin-key" onclick="pinPress('2')">2</div>
-    <div class="pin-key" onclick="pinPress('3')">3</div>
-    <div class="pin-key" onclick="pinPress('4')">4</div>
-    <div class="pin-key" onclick="pinPress('5')">5</div>
-    <div class="pin-key" onclick="pinPress('6')">6</div>
-    <div class="pin-key" onclick="pinPress('7')">7</div>
-    <div class="pin-key" onclick="pinPress('8')">8</div>
-    <div class="pin-key" onclick="pinPress('9')">9</div>
-    <div class="pin-key fn" onclick="pinPress('clear')">C</div>
-    <div class="pin-key" onclick="pinPress('0')">0</div>
-    <div class="pin-key fn" onclick="pinPress('del')">←</div>
-  </div>
-</div>
+<!-- PIN -->
 
-<!-- MAIN APP -->
-<div class="app-screen" id="appScreen">
-  <div class="app-header">
-    <div class="app-header-logo">AB</div>
-    <h1>Nuovo Ticket</h1>
-  </div>
-  <div class="app-body">
-    <div class="upload-zone" id="uploadZone">
-      <input type="file" accept="image/*" id="fileInput" onchange="handleFile(this)">
-      <div class="upload-icon">📸</div>
-      <div class="upload-text">Tocca per caricare uno <strong>screenshot</strong><br>della chat WhatsApp</div>
-      <img class="preview-img" id="previewImg">
-      <button class="remove-img" onclick="removeImage(event)">✕</button>
-    </div>
-    <div class="field-card">
-      <label>Priorità</label>
-      <div class="priority-row">
-        <button class="priority-btn" data-p="low" onclick="setPriority(this)">Bassa</button>
-        <button class="priority-btn active" data-p="medium" onclick="setPriority(this)">Media</button>
-        <button class="priority-btn" data-p="high" onclick="setPriority(this)">Alta</button>
-        <button class="priority-btn" data-p="critical" onclick="setPriority(this)">Critica</button>
-      </div>
-    </div>
-    <div class="field-card">
-      <label>Note aggiuntive (opzionale)</label>
-      <textarea class="note-input" id="noteInput" placeholder="Es: urgente, il cliente ha chiamato 3 volte..."></textarea>
-    </div>
-    <button class="submit-btn" id="submitBtn" onclick="submitTicket()" disabled>
-      <span class="btn-label">Invia Screenshot e Crea Ticket</span>
-      <span class="spinner"></span>
-      <span class="btn-status" id="btnStatus">Analisi in corso...</span>
-    </button>
-  </div>
-</div>
+<div class="scr on" id="pinScr"><div class="pin-scr">
+<div class="logo" style="width:56px;height:56px;font-size:20px;border-radius:16px;margin-bottom:20px;box-shadow:0 6px 24px rgba(43,127,232,.3)">AB</div>
+<div style="font-size:20px;font-weight:700;margin-bottom:4px">ANYBYTE Ops</div>
+<div id="pinMsg" style="font-size:13px;color:var(--mt);margin-bottom:28px">Inserisci il PIN per accedere</div>
+<div class="pd" id="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+<div class="kpd">
+<div class="pk" onclick="pp('1')">1</div><div class="pk" onclick="pp('2')">2</div><div class="pk" onclick="pp('3')">3</div>
+<div class="pk" onclick="pp('4')">4</div><div class="pk" onclick="pp('5')">5</div><div class="pk" onclick="pp('6')">6</div>
+<div class="pk" onclick="pp('7')">7</div><div class="pk" onclick="pp('8')">8</div><div class="pk" onclick="pp('9')">9</div>
+<div class="pk fn" onclick="pp('c')">C</div><div class="pk" onclick="pp('0')">0</div><div class="pk fn" onclick="pp('d')">←</div>
+</div></div></div>
 
-<!-- RESULT SCREEN -->
-<div class="result-screen" id="resultScreen">
-  <div class="result-check" id="resultIcon">✓</div>
-  <div class="result-title" id="resultTitle">Ticket creato!</div>
-  <div class="result-ticket" id="resultTicket"></div>
-  <div class="result-detail" id="resultDetail"></div>
-  <div class="result-meta" id="resultMeta">
-    <div class="meta-row"><span class="meta-label">Cliente</span><span class="meta-value" id="metaClient">—</span></div>
-    <div class="meta-row"><span class="meta-label">Oggetto</span><span class="meta-value" id="metaSubject">—</span></div>
-    <div class="meta-row"><span class="meta-label">Priorità</span><span class="meta-value" id="metaPriority">—</span></div>
-  </div>
-  <button class="new-ticket-btn" onclick="resetApp()">Nuovo ticket</button>
-</div>
+<!-- MENU -->
+
+<div class="scr" id="menuScr"><div class="hdr"><div class="logo">AB</div><h1>ANYBYTE Ops</h1></div><div class="bdy" id="menuBody"></div></div>
+
+<!-- Generic screens with dynamic content -->
+
+<div class="scr" id="openScr"><div class="hdr"><div class="bk" onclick="go('menu')">←</div><div class="logo">AB</div><h1>📸 Apri Ticket</h1></div><div class="bdy">
+<div class="uz" id="openUz"><input type="file" accept="image/*" onchange="loadImg(this,'open')"><div class="uzp"><div style="font-size:34px;opacity:.7">📸</div><div style="font-size:13px;color:var(--mt)">Carica <span style="color:var(--cy)">screenshot</span></div></div><img class="prv" id="openPrv"><button class="rmb" onclick="rmImg(event,'open')">✕</button></div>
+<div class="crd"><span class="lbl">Priorità</span><div class="pr" id="openPrio"><button class="pb" data-p="low" onclick="sp(this)">Bassa</button><button class="pb on" data-p="medium" onclick="sp(this)">Media</button><button class="pb" data-p="high" onclick="sp(this)">Alta</button><button class="pb" data-p="critical" onclick="sp(this)">Critica</button></div></div>
+<div class="crd"><span class="lbl">Note (opzionale)</span><textarea class="inp" id="openNote" placeholder="Es: il cliente ha chiamato 3 volte..."></textarea></div>
+</div><div class="fix"><button class="btn" id="openBtn" onclick="submit('open')" disabled>Invia e Crea Ticket</button></div></div>
+
+<div class="scr" id="updateScr"><div class="hdr"><div class="bk" onclick="go('menu')">←</div><div class="logo">AB</div><h1>💬 Aggiorna Ticket</h1></div><div class="bdy">
+<div class="crd"><span class="lbl">Numero Ticket</span><input class="inp" id="updTk" placeholder="TK-2026-0001" oninput="chkUpd()"></div>
+<div class="uz" id="updateUz"><input type="file" accept="image/*" onchange="loadImg(this,'update')"><div class="uzp"><div style="font-size:34px;opacity:.7">📸</div><div style="font-size:13px;color:var(--mt)">Screenshot <span style="color:var(--cy)">(opzionale)</span></div></div><img class="prv" id="updatePrv"><button class="rmb" onclick="rmImg(event,'update')">✕</button></div>
+<div class="crd"><span class="lbl">Commento</span><textarea class="inp" id="updCmt" placeholder="Descrivi l'aggiornamento..." oninput="chkUpd()"></textarea></div>
+</div><div class="fix"><button class="btn" id="updBtn" onclick="submit('update')" disabled>Aggiorna Ticket</button></div></div>
+
+<div class="scr" id="closeScr"><div class="hdr"><div class="bk" onclick="go('menu')">←</div><div class="logo">AB</div><h1>✅ Chiudi Ticket</h1></div><div class="bdy">
+<div class="crd"><span class="lbl">Numero Ticket (opzionale)</span><input class="inp" id="clsTk" placeholder="Claude lo cerca se vuoto"></div>
+<div class="uz" id="closeUz"><input type="file" accept="image/*" onchange="loadImg(this,'close')"><div class="uzp"><div style="font-size:34px;opacity:.7">📸</div><div style="font-size:13px;color:var(--mt)">Screenshot <span style="color:var(--cy)">risoluzione</span></div></div><img class="prv" id="closePrv"><button class="rmb" onclick="rmImg(event,'close')">✕</button></div>
+<div class="crd"><span class="lbl">Durata intervento</span><input class="inp" id="clsDur" placeholder="30min, 1h, 2h30min"></div>
+<div class="crd"><span class="lbl">Note chiusura (opzionale)</span><textarea class="inp" id="clsNote" placeholder="Dettagli risoluzione..."></textarea></div>
+</div><div class="fix"><button class="btn" id="clsBtn" onclick="submit('close')" disabled>Chiudi Ticket</button></div></div>
+
+<div class="scr" id="ticketsScr"><div class="hdr"><div class="bk" onclick="go('menu')">←</div><div class="logo">AB</div><h1>Ticket</h1></div><div class="bdy" id="ticketsBody"></div></div>
+<div class="scr" id="detailScr"><div class="hdr"><div class="bk" id="detailBack" onclick="go('tickets')">←</div><div class="logo">AB</div><h1 id="detailTitle">Ticket</h1></div><div class="bdy" id="detailBody"></div></div>
+<div class="scr" id="searchScr"><div class="hdr"><div class="bk" onclick="go('menu')">←</div><div class="logo">AB</div><h1>Cerca</h1></div><div class="bdy"><div style="display:flex;gap:8px"><input class="inp" id="searchQ" placeholder="Numero, cliente, keyword..." style="flex:1" onkeydown="if(event.key==='Enter')doSearch()"><button class="btn" onclick="doSearch()" style="width:50px;padding:10px;font-size:16px">🔍</button></div><div id="searchRes"></div></div></div>
+<div class="scr" id="timerScr"><div class="hdr"><div class="bk" onclick="go('menu')">←</div><div class="logo">AB</div><h1>⏱ Timer</h1></div><div class="bdy" style="align-items:center;justify-content:center"><div class="crd" style="width:100%"><span class="lbl">Ticket</span><input class="inp" id="timerTk" placeholder="TK-2026-0001"></div><div class="tmr" id="tmrDisp">00:00:00</div><div id="tmrBtns" style="display:flex;gap:10px;width:100%"></div><div id="tmrSave" style="width:100%;margin-top:12px"></div></div></div>
+<div class="scr" id="photosScr"><div class="hdr"><div class="bk" onclick="go('menu')">←</div><div class="logo">AB</div><h1>📷 Foto</h1></div><div class="bdy" id="photosBody"></div></div>
+<div class="scr" id="recapScr"><div class="hdr"><div class="bk" onclick="go('menu')">←</div><div class="logo">AB</div><h1>📊 Riepilogo</h1></div><div class="bdy" id="recapBody"></div></div>
+<div class="scr" id="reportScr"><div class="hdr"><div class="bk" onclick="go('menu')">←</div><div class="logo">AB</div><h1>📄 Report</h1></div><div class="bdy" id="reportBody"></div></div>
+<div class="scr" id="timesheetScr"><div class="hdr"><div class="bk" onclick="go('menu')">←</div><div class="logo">AB</div><h1>⏱ Timesheet</h1></div><div class="bdy" id="tsBody"></div></div>
+<div class="scr" id="agendaScr"><div class="hdr"><div class="bk" onclick="go('menu')">←</div><div class="logo">AB</div><h1>📅 Agenda</h1></div><div class="bdy" id="agendaBody"></div></div>
+<div class="scr" id="notesScr"><div class="hdr"><div class="bk" onclick="go('menu')">←</div><div class="logo">AB</div><h1>📝 Note</h1></div><div class="bdy" id="notesBody"></div></div>
+<div class="scr" id="contactsScr"><div class="hdr"><div class="bk" onclick="go('menu')">←</div><div class="logo">AB</div><h1>📞 Contatti</h1></div><div class="bdy" id="contactsBody"></div></div>
+<div class="scr" id="contractsScr"><div class="hdr"><div class="bk" onclick="go('menu')">←</div><div class="logo">AB</div><h1>📋 Contratti</h1></div><div class="bdy" id="contractsBody"></div></div>
+<div class="scr" id="quoteScr"><div class="hdr"><div class="bk" onclick="go('menu')">←</div><div class="logo">AB</div><h1>💰 Preventivo</h1></div><div class="bdy" id="quoteBody"></div><div class="fix"><button class="btn" id="quoteBtn" onclick="genQuote()">Genera Preventivo con Claude</button></div></div>
+<div class="scr" id="resultScr"><div class="hdr"><div class="logo">AB</div><h1>Risultato</h1></div><div class="bdy rl" style="align-items:center;justify-content:center;text-align:center;padding-bottom:40px" id="resultBody"></div></div>
 
 <script>
-const WEBHOOK_URL = 'https://automation.anybyte.it/webhook/whatsapp-ticket';
-let pinCode = '', currentPriority = 'medium', imageBase64 = null;
+const W='https://automation.anybyte.it/webhook/whatsapp-ticket';
+const AB='https://yutmbzmzrfcmgvibpckl.supabase.co/functions/v1';
+const AK='key_prod_X9vNcA1dR6sTy7fK29xLmQ8pZ3HjB5uE';
+const UID='bf8c267d-5a12-41e4-9334-c8132252f7bf';
+let pin='',imgs={open:null,update:null,close:null,photos:null},tickets=[],clients=[],tkFilter='open';
+let tmrOn=false,tmrStart=0,tmrEl=0,tmrInt=null,tmrSaved=false;
+const LS=k=>JSON.parse(localStorage.getItem('ab_'+k)||'[]');
+const SS=(k,v)=>localStorage.setItem('ab_'+k,JSON.stringify(v));
 
-function pinPress(key) {
-  const dots = document.querySelectorAll('.pin-dot');
-  if (key === 'clear') { pinCode = ''; dots.forEach(d => d.className = 'pin-dot'); return; }
-  if (key === 'del') { if (pinCode.length > 0) { pinCode = pinCode.slice(0,-1); dots[pinCode.length].className = 'pin-dot'; } return; }
-  if (pinCode.length >= 4) return;
-  pinCode += key;
-  dots[pinCode.length - 1].classList.add('filled');
-  if (pinCode.length === 4) setTimeout(validatePin, 200);
-}
+async function aApi(p,o={}){const r=await fetch(AB+p,{...o,headers:{'x-api-key':AK,'Content-Type':'application/json',...(o.headers||{})}});return r.json()}
+function go(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));document.getElementById(id+'Scr').classList.add('on');
+if(id==='menu')buildMenu();if(id==='tickets')buildTkList();if(id==='timer')renderTmr();if(id==='photos')buildPhotos();
+if(id==='recap')buildRecap();if(id==='report')buildReport();if(id==='timesheet')buildTS();if(id==='agenda')buildAgenda();
+if(id==='notes')buildNotes();if(id==='contacts')buildContacts();if(id==='contracts')buildContracts();if(id==='quote')buildQuote()}
 
-function validatePin() {
-  sessionStorage.setItem('pin', pinCode);
-  document.getElementById('pinScreen').style.display = 'none';
-  document.getElementById('appScreen').style.display = 'flex';
-}
+// PIN
+function pp(k){const dots=document.querySelectorAll('#dots .dot');if(k==='c'){pin='';dots.forEach(d=>d.className='dot');return}if(k==='d'){if(pin.length>0){pin=pin.slice(0,-1);dots[pin.length].className='dot'}return}if(pin.length>=4)return;pin+=k;dots[pin.length-1].classList.add('on');if(pin.length===4)setTimeout(()=>{sessionStorage.setItem('pin',pin);init()},200)}
+async function init(){await Promise.all([loadTk(),loadCl()]);go('menu')}
+async function loadTk(){try{const r=await aApi('/api-tickets?user_id='+UID+'&limit=100');tickets=r.tickets||[]}catch(e){tickets=[]}}
+async function loadCl(){try{const r=await aApi('/api-clients?user_id='+UID+'&limit=100');clients=r.clients||[]}catch(e){clients=[]}}
 
-function handleFile(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const img = new Image();
-    img.onload = function() {
-      const canvas = document.createElement('canvas');
-      let w = img.width, h = img.height;
-      const ratio = Math.min(1200/w, 1600/h, 1);
-      w = Math.round(w * ratio); h = Math.round(h * ratio);
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      imageBase64 = canvas.toDataURL('image/jpeg', 0.85);
-      document.getElementById('previewImg').src = imageBase64;
-      document.getElementById('uploadZone').classList.add('has-image');
-      document.getElementById('submitBtn').disabled = false;
-    };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
+// MENU
+function buildMenu(){
+const op=tickets.filter(t=>t.status==='open').length,ip=tickets.filter(t=>t.status==='in_progress').length;
+const urg=tickets.filter(t=>(t.status==='open'||t.status==='in_progress')&&(t.priority==='critical'||t.priority==='high')).length;
+const old=tickets.filter(t=>{if(t.status!=='open')return false;const d=new Date(t.created_at||t.created||0);return(Date.now()-d.getTime())>48*36e5}).length;
+const notes=LS('notes');
+let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:13px;font-weight:600">Panoramica</span><button class="btn2" onclick="loadTk().then(()=>buildMenu())" style="padding:5px 12px;font-size:11px">🔄</button></div>`;
+h+=`<div style="display:flex;gap:8px;margin-bottom:10px"><div class="st"><div class="n" style="color:var(--wn)">${op}</div><div class="l">Aperti</div></div><div class="st"><div class="n" style="color:var(--cy)">${ip}</div><div class="l">In corso</div></div><div class="st"><div class="n" style="color:var(--er)">${urg}</div><div class="l">Urgenti</div></div></div>`;
+if(old>0)h+=`<div class="crd" style="background:rgba(239,83,80,.08);border-color:rgba(239,83,80,.2);display:flex;align-items:center;gap:10px"><span style="font-size:20px">⚠️</span><div><div style="font-size:13px;font-weight:600">${old} ticket fermi da 48h+</div><div style="font-size:11px;color:var(--mt)">Richiedono attenzione</div></div></div>`;
+h+=sec('Ticket');
+h+=mc('📸','rgba(45,212,160,.12)','Apri Ticket','Screenshot → Claude → ticket','open');
+h+=mc('💬','rgba(245,158,11,.12)','Aggiorna Ticket','Aggiungi commento','update');
+h+=mc('✅','rgba(239,83,80,.12)','Chiudi Ticket','Screenshot risoluzione → chiudi','close');
+h+=mc('📋','rgba(43,127,232,.12)','Lista Ticket','Tutti i ticket','tickets',op);
+h+=mc('🔍','rgba(0,194,255,.12)','Cerca','Numero, cliente, keyword','search');
+h+=sec('Lavoro');
+h+=mc('⏱','rgba(45,212,160,.12)','Timer Intervento','Cronometra e salva','timer');
+h+=mc('📷','rgba(139,92,246,.12)','Foto Documentazione','Scatta e allega al ticket','photos');
+h+=mc('⚡','rgba(245,158,11,.12)','Intervento Rapido','Apri e chiudi in un colpo','open');
+h+=sec('Report');
+h+=mc('📊','rgba(0,194,255,.12)','Riepilogo Giornata','Riepilogo ticket di oggi','recap');
+h+=mc('📄','rgba(43,127,232,.12)','Report Cliente','Report interventi per cliente','report');
+h+=mc('⏱','rgba(45,212,160,.12)','Timesheet','Ore per cliente','timesheet');
+h+=sec('Gestione');
+h+=mc('📅','rgba(245,158,11,.12)','Agenda','Ticket con data intervento','agenda');
+h+=mc('📝','rgba(139,92,246,.12)','Note Veloci','Appunti per cliente','notes',notes.length||null);
+h+=mc('📞','rgba(0,194,255,.12)','Contatti Rapidi','Chiama o scrivi','contacts',clients.length||null);
+h+=mc('📋','rgba(239,83,80,.12)','Scadenze Contratti','Contratti in scadenza','contracts');
+h+=mc('💰','rgba(245,158,11,.12)','Preventivo Rapido','Genera con Claude','quote');
+h+=`<div style="text-align:center;padding:16px 0 8px;font-size:11px;color:var(--mt)">ANYBYTE SRL — AnyOps v1.0</div>`;
+document.getElementById('menuBody').innerHTML=h}
+function sec(t){return`<div style="font-size:13px;font-weight:600;margin-top:6px">${t}</div>`}
+function mc(i,bg,t,d,act,bdg){return`<div class="mc" onclick="go('${act}')"><div class="mi" style="background:${bg}">${i}</div><div style="flex:1"><h3>${t}</h3><p>${d}</p></div>${bdg?`<div class="bdg" style="background:var(--wn)">${bdg}</div>`:''}<div style="color:var(--mt);font-size:18px">›</div></div>`}
 
-function removeImage(e) {
-  e.stopPropagation(); e.preventDefault();
-  imageBase64 = null;
-  document.getElementById('fileInput').value = '';
-  document.getElementById('uploadZone').classList.remove('has-image');
-  document.getElementById('submitBtn').disabled = true;
-}
+// IMAGE
+function loadImg(input,type){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas');let w=img.width,h=img.height;const ratio=Math.min(1200/w,1600/h,1);w=Math.round(w*ratio);h=Math.round(h*ratio);c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);imgs[type]=c.toDataURL('image/jpeg',.85);document.getElementById(type+'Prv').src=imgs[type];document.getElementById(type+'Uz').classList.add('has');const b=document.getElementById(type+'Btn');if(b&&type!=='update')b.disabled=false;if(type==='update')chkUpd()};img.src=e.target.result};r.readAsDataURL(f)}
+function rmImg(e,type){e.stopPropagation();e.preventDefault();imgs[type]=null;document.getElementById(type+'Uz').querySelector('input').value='';document.getElementById(type+'Uz').classList.remove('has');if(type!=='update'){const b=document.getElementById(type+'Btn');if(b)b.disabled=true}}
+function sp(btn){btn.parentElement.querySelectorAll('.pb').forEach(b=>b.classList.remove('on'));btn.classList.add('on')}
+function chkUpd(){document.getElementById('updBtn').disabled=!(document.getElementById('updTk').value.trim()&&document.getElementById('updCmt').value.trim())}
+function getPrio(id){const el=document.querySelector('#'+id+' .pb.on');return el?el.dataset.p:'medium'}
 
-function setPriority(btn) {
-  document.querySelectorAll('.priority-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  currentPriority = btn.dataset.p;
-}
+// SUBMIT
+async function submit(type){const btn=document.getElementById(type==='update'?'updBtn':type+'Btn');btn.disabled=true;btn.textContent='⏳ Elaborazione...';
+const payload={pin:sessionStorage.getItem('pin'),action:type};
+if(type==='open'){payload.image=imgs.open?.split(',')[1];payload.priority=getPrio('openPrio');payload.note=document.getElementById('openNote').value.trim()}
+else if(type==='update'){payload.ticket_id=document.getElementById('updTk').value.trim();payload.comment=document.getElementById('updCmt').value.trim();payload.image=imgs.update?.split(',')[1]}
+else{payload.ticket_id=document.getElementById('clsTk').value.trim();payload.image=imgs.close?.split(',')[1];payload.duration=document.getElementById('clsDur').value.trim();payload.note=document.getElementById('clsNote').value.trim()}
+try{const r=await fetch(W,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const data=await r.json();if(data.error==='invalid_pin'){sessionStorage.removeItem('pin');location.reload();return}showResult(type,data)}catch(e){showResult(type,{success:false,message:'Errore di connessione'})}
+resetForm(type);loadTk()}
+function resetForm(type){imgs[type]=null;if(type==='open'){document.getElementById('openUz').classList.remove('has');document.getElementById('openUz').querySelector('input').value='';document.getElementById('openNote').value='';document.getElementById('openBtn').textContent='Invia e Crea Ticket';document.getElementById('openBtn').disabled=true;document.querySelectorAll('#openPrio .pb').forEach(b=>b.classList.toggle('on',b.dataset.p==='medium'))}else if(type==='update'){document.getElementById('updateUz').classList.remove('has');document.getElementById('updateUz').querySelector('input').value='';document.getElementById('updTk').value='';document.getElementById('updCmt').value='';document.getElementById('updBtn').textContent='Aggiorna Ticket';document.getElementById('updBtn').disabled=true}else{document.getElementById('closeUz').classList.remove('has');document.getElementById('closeUz').querySelector('input').value='';document.getElementById('clsTk').value='';document.getElementById('clsDur').value='';document.getElementById('clsNote').value='';document.getElementById('clsBtn').textContent='Chiudi Ticket';document.getElementById('clsBtn').disabled=true}}
 
-async function submitTicket() {
-  if (!imageBase64) return;
-  const btn = document.getElementById('submitBtn');
-  const status = document.getElementById('btnStatus');
-  btn.classList.add('loading'); btn.disabled = true;
-  status.textContent = 'Invio screenshot...';
-  try {
-    const payload = {
-      pin: sessionStorage.getItem('pin'),
-      image: imageBase64.split(',')[1],
-      priority: currentPriority,
-      note: document.getElementById('noteInput').value.trim()
-    };
-    status.textContent = 'Claude sta analizzando...';
-    const resp = await fetch(WEBHOOK_URL, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-    const data = await resp.json();
-    if (data.success) { showResult(true, data); }
-    else if (data.error === 'invalid_pin') { showPinError(); }
-    else { showResult(false, data); }
-  } catch(err) { showResult(false, { message: 'Errore di connessione. Riprova.' }); }
-  btn.classList.remove('loading'); btn.disabled = false;
-}
+// RESULT
+function showResult(type,data){const ok=data.success;const t={open:'Ticket creato!',update:'Ticket aggiornato!',close:'Ticket chiuso!'};const e={open:'Errore creazione',update:'Errore aggiornamento',close:'Errore chiusura'};const pl={low:'🟢 Bassa',medium:'🟡 Media',high:'🟠 Alta',critical:'🔴 Critica'};
+let h=`<div class="ri" style="background:${ok?'rgba(45,212,160,.12)':'rgba(239,83,80,.12)';animation:pop .4s cubic-bezier(.34,1.56,.64,1)">${ok?'✓':'✗'}</div>`;
+h+=`<div style="font-size:18px;font-weight:700">${ok?t[type]:e[type]}</div>`;
+if(data.ticket_number)h+=`<div class="rt">${data.ticket_number}</div>`;
+if(data.message)h+=`<div style="color:var(--mt);font-size:13px;max-width:280px">${data.message}</div>`;
+if(ok&&type!=='update'){h+=`<div class="crd" style="margin-top:14px;width:100%;max-width:300px;text-align:left">`;
+[['Cliente',data.client],['Oggetto',data.subject],['Priorità',pl[data.priority]||data.priority],['Data',data.intervention_date],['Durata',data.duration]].forEach(([l,v])=>{if(v&&v!=='—'&&v!=='undefined')h+=`<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="color:var(--mt)">${l}</span><span style="font-weight:600;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${v}</span></div>`});h+=`</div>`}
+if(ok&&data.client_message){h+=`<div class="crd" style="margin-top:10px;width:100%;max-width:300px;text-align:left"><div style="font-size:11px;color:var(--mt);margin-bottom:5px">Messaggio per il cliente:</div><div id="cmsg" style="font-size:13px;line-height:1.5">${data.client_message}</div><button class="btn" onclick="navigator.clipboard.writeText(document.getElementById('cmsg').textContent).then(()=>{this.textContent='✓ Copiato!';setTimeout(()=>this.textContent='📋 Copia',2e3)})" style="margin-top:8px;padding:8px;font-size:12px">📋 Copia</button></div>`}
+h+=`<button class="btn2" onclick="go('menu')" style="margin-top:18px">Menu principale</button>`;
+document.getElementById('resultBody').innerHTML=h;if(navigator.vibrate)navigator.vibrate(ok?[100]:[100,50,100]);go('result')}
 
-function showResult(ok, data) {
-  document.getElementById('appScreen').style.display = 'none';
-  const s = document.getElementById('resultScreen'); s.style.display = 'flex';
-  if (ok) {
-    s.classList.remove('error-state');
-    document.getElementById('resultIcon').textContent = '✓';
-    document.getElementById('resultTitle').textContent = 'Ticket creato!';
-    document.getElementById('resultTicket').textContent = data.ticket_number || '';
-    document.getElementById('resultDetail').textContent = data.message || '';
-    document.getElementById('metaClient').textContent = data.client || '—';
-    document.getElementById('metaSubject').textContent = data.subject || '—';
-    const pl = {low:'🟢 Bassa',medium:'🟡 Media',high:'🟠 Alta',critical:'🔴 Critica'};
-    document.getElementById('metaPriority').textContent = pl[currentPriority];
-    document.getElementById('resultMeta').style.display = 'flex';
-  } else {
-    s.classList.add('error-state');
-    document.getElementById('resultIcon').textContent = '✗';
-    document.getElementById('resultTitle').textContent = 'Errore';
-    document.getElementById('resultTicket').textContent = '';
-    document.getElementById('resultDetail').textContent = data.message || 'Qualcosa è andato storto';
-    document.getElementById('resultMeta').style.display = 'none';
-  }
-  if (navigator.vibrate) navigator.vibrate(ok ? [100] : [100,50,100]);
-}
+// TICKET LIST
+function buildTkList(){const pc={low:'#166534',medium:'#854d0e',high:'#c2410c',critical:'#dc2626'};const sc={open:'var(--wn)',in_progress:'var(--cy)',resolved:'var(--ok)',closed:'var(--mt)'};const sl={open:'Aperto',in_progress:'In corso',resolved:'Risolto',closed:'Chiuso'};
+const ft=tkFilter==='all'?tickets:tickets.filter(t=>t.status===tkFilter);
+let h=`<div class="fltr">`;[['all','Tutti'],['open','Aperti'],['in_progress','In corso'],['closed','Chiusi']].forEach(([k,l])=>{h+=`<button class="btn2" onclick="tkFilter='${k}';buildTkList()" style="font-size:11px;padding:6px 12px;background:${tkFilter===k?'var(--nv)':'var(--cd)'};color:${tkFilter===k?'#fff':'var(--mt)'};border-color:${tkFilter===k?'var(--nv)':'var(--bd)'}">${l}</button>`});h+=`</div>`;
+if(!ft.length)h+=`<div class="empty"><div class="ei">📭</div><div class="et">Nessun ticket</div></div>`;
+ft.forEach(t=>{h+=`<div class="crd tl-item" onclick="showDet('${t.id}')"><div class="info"><h4>${esc(t.subject||t.number||'—')}</h4><span>${esc(t.client_name||'—')} · ${t.number||''}</span></div><div class="badges"><div class="bdg" style="background:${sc[t.status]||'var(--mt)'}">${sl[t.status]||t.status}</div><div class="bdg" style="background:${pc[t.priority]||'var(--mt)'}">${t.priority||'—'}</div></div></div>`});
+document.getElementById('ticketsBody').innerHTML=h}
+function showDet(id){const t=tickets.find(x=>x.id===id);if(!t)return;document.getElementById('detailTitle').textContent=t.number||'Ticket';document.getElementById('detailBack').setAttribute('onclick',"go('tickets')");
+let h=`<div class="crd"><div style="font-size:16px;font-weight:700;margin-bottom:6px">${esc(t.subject||'—')}</div><div style="font-size:12px;color:var(--mt);line-height:1.6">Cliente: ${esc(t.client_name||'—')}<br>Stato: ${t.status} · Priorità: ${t.priority}<br>Creato: ${t.created_at||t.created||'—'}</div></div>`;
+if(t.description)h+=`<div class="crd"><span class="lbl">Descrizione</span><div style="font-size:13px;line-height:1.5;white-space:pre-wrap">${esc(t.description)}</div></div>`;
+if(t.intervention_report)h+=`<div class="crd"><span class="lbl">Resoconto</span><div style="font-size:13px;line-height:1.5;white-space:pre-wrap">${esc(t.intervention_report)}</div></div>`;
+if(t.intervention_date)h+=`<div class="crd"><span class="lbl">Data intervento</span><div style="font-size:13px">${t.intervention_date}</div></div>`;
+if(t.intervention_duration)h+=`<div class="crd"><span class="lbl">Durata</span><div style="font-size:13px">${t.intervention_duration}</div></div>`;
+document.getElementById('detailBody').innerHTML=h;go('detail')}
 
-function showPinError() {
-  document.getElementById('appScreen').style.display = 'none';
-  document.getElementById('pinScreen').style.display = 'flex';
-  pinCode = '';
-  const dots = document.querySelectorAll('.pin-dot');
-  dots.forEach(d => d.className = 'pin-dot error');
-  document.querySelector('.pin-subtitle').textContent = 'PIN errato. Riprova.';
-  document.querySelector('.pin-subtitle').style.color = 'var(--error)';
-  setTimeout(() => { dots.forEach(d => d.className = 'pin-dot'); document.querySelector('.pin-subtitle').textContent = 'Inserisci il PIN per accedere'; document.querySelector('.pin-subtitle').style.color = ''; }, 1500);
-}
+// SEARCH
+async function doSearch(){const q=document.getElementById('searchQ').value.trim();if(!q)return;document.getElementById('searchRes').innerHTML='<div style="text-align:center;padding:20px;color:var(--mt)">🔄 Ricerca...</div>';
+try{let res=[];if(q.toUpperCase().startsWith('TK')){const r=await aApi('/api-tickets/'+q);if(r.ticket)res=[r.ticket]}if(!res.length){res=tickets.filter(t=>[t.subject,t.client_name,t.number,t.description].join(' ').toLowerCase().includes(q.toLowerCase()))}
+let h='';if(!res.length)h='<div class="empty"><div class="ei">🔍</div><div class="et">Nessun risultato</div></div>';
+res.forEach(t=>{h+=`<div class="crd" style="cursor:pointer;margin-top:8px" onclick="showDet('${t.id}')"><div style="font-size:13px;font-weight:600">${esc(t.subject||t.number||'—')}</div><div style="font-size:11px;color:var(--mt)">${esc(t.client_name||'—')} · ${t.number||''} · ${t.status}</div></div>`});
+document.getElementById('searchRes').innerHTML=h}catch(e){document.getElementById('searchRes').innerHTML='<div class="empty"><div class="ei">❌</div><div class="et">Errore</div></div>'}}
 
-function resetApp() {
-  document.getElementById('resultScreen').style.display = 'none';
-  document.getElementById('appScreen').style.display = 'flex';
-  imageBase64 = null;
-  document.getElementById('fileInput').value = '';
-  document.getElementById('uploadZone').classList.remove('has-image');
-  document.getElementById('noteInput').value = '';
-  document.getElementById('submitBtn').disabled = true;
-  currentPriority = 'medium';
-  document.querySelectorAll('.priority-btn').forEach(b => b.classList.toggle('active', b.dataset.p === 'medium'));
-}
+// TIMER
+function renderTmr(){const s=tmrEl,hh=Math.floor(s/3600),mm=Math.floor((s%3600)/60),ss=s%60;document.getElementById('tmrDisp').textContent=`${S2(hh)}:${S2(mm)}:${S2(ss)}`;document.getElementById('tmrDisp').style.color=tmrOn?'var(--cy)':'var(--tx)';
+let b='';if(!tmrOn&&tmrEl===0)b=`<button class="btn" style="flex:1" onclick="startTmr()">▶ Avvia</button>`;else if(tmrOn)b=`<button class="btn" style="flex:1;background:var(--er)" onclick="stopTmr()">⏸ Pausa</button>`;else b=`<button class="btn" style="flex:1" onclick="startTmr()">▶ Riprendi</button><button class="btn2" style="flex:1" onclick="rstTmr()">↺ Reset</button>`;
+document.getElementById('tmrBtns').innerHTML=b;let sv='';if(!tmrOn&&tmrEl>0&&!tmrSaved)sv=`<button class="btn" style="background:linear-gradient(135deg,var(--ok),#059669)" onclick="saveTmr()">💾 Salva ${fmtD(tmrEl)} sul ticket</button>`;if(tmrSaved)sv=`<div style="color:var(--ok);font-size:14px;font-weight:600;text-align:center">✓ Salvato!</div>`;document.getElementById('tmrSave').innerHTML=sv}
+function S2(n){return String(n).padStart(2,'0')}
+function fmtD(s){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60);return h>0&&m>0?h+'h'+m+'min':h>0?h+'h':m+'min'}
+function startTmr(){tmrOn=true;tmrStart=Date.now()-tmrEl*1000;tmrSaved=false;tmrInt=setInterval(()=>{tmrEl=Math.floor((Date.now()-tmrStart)/1000);renderTmr()},1000);renderTmr()}
+function stopTmr(){tmrOn=false;clearInterval(tmrInt);renderTmr()}
+function rstTmr(){tmrOn=false;clearInterval(tmrInt);tmrEl=0;tmrSaved=false;renderTmr()}
+async function saveTmr(){const tk=document.getElementById('timerTk').value.trim();if(!tk){alert('Inserisci il numero ticket');return}try{await aApi('/api-tickets/'+tk,{method:'PATCH',body:JSON.stringify({intervention_duration:fmtD(tmrEl),intervention_date:new Date().toISOString().split('T')[0]})});tmrSaved=true;renderTmr()}catch(e){alert('Errore')}}
 
-if (sessionStorage.getItem('pin')) {
-  document.getElementById('pinScreen').style.display = 'none';
-  document.getElementById('appScreen').style.display = 'flex';
-}
+// PHOTOS
+function buildPhotos(){const photos=LS('photos');
+let h=`<div class="crd"><span class="lbl">Ticket</span><input class="inp" id="photoTk" placeholder="TK-2026-0001"></div>`;
+h+=`<div class="uz" id="photosUz"><input type="file" accept="image/*" capture="environment" onchange="loadImg(this,'photos')"><div class="uzp"><div style="font-size:34px;opacity:.7">📷</div><div style="font-size:13px;color:var(--mt)">Scatta o carica <span style="color:var(--cy)">foto</span></div></div><img class="prv" id="photosPrv"><button class="rmb" onclick="rmImg(event,'photos')">✕</button></div>`;
+h+=`<div class="crd"><span class="lbl">Descrizione foto</span><input class="inp" id="photoDesc" placeholder="Es: cablaggio rack, etichetta switch..."></div>`;
+h+=`<button class="btn" onclick="savePhoto()" style="margin-top:4px">💾 Salva foto</button>`;
+if(photos.length){h+=`<div style="font-size:13px;font-weight:600;margin-top:12px">Foto salvate (${photos.length})</div>`;photos.slice(-10).reverse().forEach((p,i)=>{h+=`<div class="crd" style="margin-top:6px"><div style="font-size:12px;font-weight:600">${esc(p.ticket)} — ${esc(p.desc)}</div><div style="font-size:11px;color:var(--mt)">${p.date}</div><img src="${p.thumb}" style="width:100%;max-height:120px;object-fit:contain;border-radius:8px;margin-top:6px"></div>`})}
+document.getElementById('photosBody').innerHTML=h}
+function savePhoto(){const tk=document.getElementById('photoTk').value.trim();const desc=document.getElementById('photoDesc').value.trim();if(!tk||!imgs.photos){alert('Inserisci ticket e foto');return}
+const photos=LS('photos');photos.push({ticket:tk,desc:desc||'Foto',date:new Date().toLocaleDateString('it-IT'),thumb:imgs.photos});SS('photos',photos);imgs.photos=null;buildPhotos()}
+
+// RECAP
+function buildRecap(){const today=new Date().toISOString().split('T')[0];const todayTk=tickets.filter(t=>(t.created_at||t.created||'').startsWith(today));const opened=todayTk.filter(t=>t.status==='open').length;const closed=tickets.filter(t=>t.status==='closed'&&(t.updated_at||'').startsWith(today)).length;const pending=tickets.filter(t=>t.status==='open').length;
+let h=`<div style="font-size:13px;font-weight:600;margin-bottom:4px">📊 Riepilogo ${new Date().toLocaleDateString('it-IT')}</div>`;
+h+=`<div style="display:flex;gap:8px;margin-bottom:10px"><div class="st"><div class="n" style="color:var(--cy)">${todayTk.length}</div><div class="l">Nuovi oggi</div></div><div class="st"><div class="n" style="color:var(--ok)">${closed}</div><div class="l">Chiusi oggi</div></div><div class="st"><div class="n" style="color:var(--wn)">${pending}</div><div class="l">In sospeso</div></div></div>`;
+if(todayTk.length){h+=`<div style="font-size:13px;font-weight:600;margin-top:4px">Ticket di oggi</div>`;todayTk.forEach(t=>{h+=`<div class="crd" style="margin-top:6px;cursor:pointer" onclick="showDet('${t.id}')"><div style="font-size:13px;font-weight:600">${esc(t.subject||'—')}</div><div style="font-size:11px;color:var(--mt)">${esc(t.client_name||'—')} · ${t.number} · ${t.status}</div></div>`})}
+const clientCount={};tickets.filter(t=>t.status==='open').forEach(t=>{const c=t.client_name||'Sconosciuto';clientCount[c]=(clientCount[c]||0)+1});
+const sorted=Object.entries(clientCount).sort((a,b)=>b[1]-a[1]).slice(0,5);
+if(sorted.length){h+=`<div style="font-size:13px;font-weight:600;margin-top:12px">Clienti con più ticket aperti</div>`;sorted.forEach(([c,n])=>{h+=`<div class="crd" style="margin-top:6px;display:flex;justify-content:space-between"><span style="font-size:13px">${esc(c)}</span><span class="bdg" style="background:var(--wn)">${n}</span></div>`})}
+document.getElementById('recapBody').innerHTML=h}
+
+// REPORT
+function buildReport(){let h=`<div class="crd"><span class="lbl">Cliente</span><select class="inp" id="repClient"><option value="">Seleziona cliente...</option>`;
+clients.forEach(c=>{h+=`<option value="${c.name}">${esc(c.name)}</option>`});
+h+=`</select></div>`;
+h+=`<div class="crd"><span class="lbl">Periodo</span><div style="display:flex;gap:8px"><input type="date" class="inp" id="repFrom" style="flex:1"><input type="date" class="inp" id="repTo" style="flex:1" value="${new Date().toISOString().split('T')[0]}"></div></div>`;
+h+=`<button class="btn" onclick="genReport()" style="margin-top:4px">📄 Genera Report</button>`;
+h+=`<div id="repResult"></div>`;
+document.getElementById('reportBody').innerHTML=h}
+function genReport(){const cl=document.getElementById('repClient').value;const from=document.getElementById('repFrom').value;const to=document.getElementById('repTo').value;
+const ft=tickets.filter(t=>{if(cl&&t.client_name!==cl)return false;const d=t.created_at||t.created||'';if(from&&d<from)return false;if(to&&d>to+'T99')return false;return true});
+let h=`<div style="font-size:13px;font-weight:600;margin-top:12px">Risultati: ${ft.length} ticket</div>`;
+const closed=ft.filter(t=>t.status==='closed').length;const open=ft.filter(t=>t.status==='open').length;
+h+=`<div style="display:flex;gap:8px;margin-top:8px"><div class="st"><div class="n">${ft.length}</div><div class="l">Totali</div></div><div class="st"><div class="n" style="color:var(--ok)">${closed}</div><div class="l">Chiusi</div></div><div class="st"><div class="n" style="color:var(--wn)">${open}</div><div class="l">Aperti</div></div></div>`;
+ft.forEach(t=>{h+=`<div class="crd" style="margin-top:6px"><div style="font-size:13px;font-weight:600">${esc(t.subject||'—')}</div><div style="font-size:11px;color:var(--mt)">${t.number} · ${t.status} · ${t.priority} · ${(t.created_at||t.created||'').split('T')[0]}</div>${t.intervention_duration?`<div style="font-size:11px;color:var(--ok);margin-top:3px">Durata: ${t.intervention_duration}</div>`:''}</div>`});
+document.getElementById('repResult').innerHTML=h}
+
+// TIMESHEET
+function buildTS(){const closed=tickets.filter(t=>t.status==='closed'&&t.intervention_duration);const byClient={};
+closed.forEach(t=>{const c=t.client_name||'Sconosciuto';if(!byClient[c])byClient[c]={count:0,durations:[]};byClient[c].count++;byClient[c].durations.push(t.intervention_duration)});
+let h=`<div style="font-size:13px;font-weight:600;margin-bottom:8px">Ore per cliente (ticket chiusi con durata)</div>`;
+if(!Object.keys(byClient).length){h+=`<div class="empty"><div class="ei">⏱</div><div class="et">Nessun dato disponibile.\nChiudi ticket con la durata per popolare il timesheet.</div></div>`}
+Object.entries(byClient).sort((a,b)=>b[1].count-a[1].count).forEach(([c,d])=>{h+=`<div class="crd" style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:14px;font-weight:600">${esc(c)}</span><span class="bdg" style="background:var(--nv)">${d.count} interventi</span></div><div style="font-size:12px;color:var(--mt)">Durate: ${d.durations.join(', ')}</div></div>`});
+document.getElementById('tsBody').innerHTML=h}
+
+// AGENDA
+function buildAgenda(){const withDate=tickets.filter(t=>t.intervention_date&&t.status!=='closed').sort((a,b)=>(a.intervention_date||'').localeCompare(b.intervention_date||''));
+let h=`<div style="font-size:13px;font-weight:600;margin-bottom:8px">Interventi programmati</div>`;
+const today=new Date().toISOString().split('T')[0];
+if(!withDate.length){h+=`<div class="empty"><div class="ei">📅</div><div class="et">Nessun intervento programmato</div></div>`}
+withDate.forEach(t=>{const isToday=t.intervention_date===today;const isPast=t.intervention_date<today;
+h+=`<div class="crd" style="margin-bottom:6px;border-color:${isToday?'var(--cy)':isPast?'var(--er)':'var(--bd)'}"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;font-weight:700;color:${isToday?'var(--cy)':isPast?'var(--er)':'var(--mt)'}">${isToday?'📍 OGGI':isPast?'⚠️ SCADUTO':''} ${t.intervention_date}</span><span class="bdg" style="background:${t.priority==='critical'?'var(--er)':t.priority==='high'?'#c2410c':'var(--wn)'}">${t.priority}</span></div><div style="font-size:14px;font-weight:600">${esc(t.subject||'—')}</div><div style="font-size:12px;color:var(--mt)">${esc(t.client_name||'—')} · ${t.number}</div></div>`});
+document.getElementById('agendaBody').innerHTML=h}
+
+// NOTES
+function buildNotes(){const notes=LS('notes');
+let h=`<div class="crd"><span class="lbl">Nuova nota</span><select class="inp" id="noteClient" style="margin-bottom:8px"><option value="">Seleziona cliente (opzionale)...</option>`;
+clients.forEach(c=>{h+=`<option value="${esc(c.name)}">${esc(c.name)}</option>`});
+h+=`</select><textarea class="inp" id="noteText" placeholder="Scrivi nota..." style="margin-bottom:8px"></textarea><button class="btn" onclick="addNote()">📝 Salva nota</button></div>`;
+
+if(notes.length){h+=`<div style="font-size:13px;font-weight:600;margin-top:8px">Note salvate</div>`;notes.slice().reverse().forEach((n,i)=>{const idx=notes.length-1-i;h+=`<div class="crd note-item" style="margin-top:6px"><button class="del" onclick="delNote(${idx})">🗑</button><div style="font-size:11px;color:var(--mt);margin-bottom:3px">${n.client?esc(n.client)+' · ':''}${n.date}</div><div style="font-size:13px;line-height:1.5;padding-right:24px">${esc(n.text)}</div></div>`})}
+document.getElementById(‘notesBody’).innerHTML=h}
+function addNote(){const cl=document.getElementById(‘noteClient’).value;const txt=document.getElementById(‘noteText’).value.trim();if(!txt){alert(‘Scrivi qualcosa’);return}const notes=LS(‘notes’);notes.push({client:cl,text:txt,date:new Date().toLocaleDateString(‘it-IT’)+’ ’+new Date().toLocaleTimeString(‘it-IT’,{hour:‘2-digit’,minute:‘2-digit’})});SS(‘notes’,notes);buildNotes()}
+function delNote(i){const notes=LS(‘notes’);notes.splice(i,1);SS(‘notes’,notes);buildNotes()}
+
+// CONTACTS
+function buildContacts(){let h=`<input class="inp" id="ctSearch" placeholder="Cerca cliente..." oninput="filterContacts()" style="margin-bottom:10px">`;
+h+=`<div id="ctList"></div>`;
+document.getElementById(‘contactsBody’).innerHTML=h;filterContacts()}
+function filterContacts(){const q=(document.getElementById(‘ctSearch’)?.value||’’).toLowerCase();const flt=q?clients.filter(c=>(c.name||’’).toLowerCase().includes(q)):clients;
+let h=’’;if(!flt.length)h=’<div class="empty"><div class="ei">📞</div><div class="et">Nessun contatto</div></div>’;
+flt.forEach(c=>{const initials=(c.name||’??’).split(’ ‘).map(w=>w[0]).join(’’).slice(0,2).toUpperCase();const phone=c.phone||’’;const email=c.email||’’;
+h+=`<div class="crd contact-item" style="margin-bottom:6px"><div class="avatar">${initials}</div><div class="cinfo"><h4>${esc(c.name)}</h4><span>${phone||email||c.city||'—'}</span></div><div class="cbtns">`;
+if(phone)h+=`<a href="tel:${phone}" style="color:var(--ok)">📞</a><a href="https://wa.me/${phone.replace(/[^0-9]/g,'')}" style="color:var(--ok)">💬</a>`;
+if(email)h+=`<a href="mailto:${email}" style="color:var(--cy)">📧</a>`;
+h+=`</div></div>`});
+const el=document.getElementById(‘ctList’);if(el)el.innerHTML=h}
+
+// CONTRACTS (from clients data, simulated)
+function buildContracts(){let h=`<div style="font-size:13px;font-weight:600;margin-bottom:8px">Contratti attivi</div>`;
+const active=clients.filter(c=>c.is_active);
+if(!active.length){h+=`<div class="empty"><div class="ei">📋</div><div class="et">Nessun contratto trovato.\nI contratti verranno mostrati quando saranno disponibili su AnyOps.</div></div>`}
+active.forEach(c=>{const tkCount=tickets.filter(t=>t.client_name===c.name).length;
+h+=`<div class="crd" style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:14px;font-weight:600">${esc(c.name)}</div><div style="font-size:11px;color:var(--mt)">${c.city||'—'}${c.vat_number?' · P.IVA '+c.vat_number:''}</div></div><div class="bdg" style="background:var(--ok)">Attivo</div></div>${tkCount?`<div style="font-size:11px;color:var(--mt);margin-top:6px">${tkCount} ticket totali</div>`:''}</div>`});
+document.getElementById(‘contractsBody’).innerHTML=h}
+
+// QUOTE
+let quoteLines=[{desc:’’,qty:‘1’,price:’’}];
+function buildQuote(){let h=`<div class="crd"><span class="lbl">Cliente</span><select class="inp" id="quoteClient"><option value="">Seleziona...</option>`;
+clients.forEach(c=>{h+=`<option value="${esc(c.name)}">${esc(c.name)}</option>`});
+h+=`</select></div>`;
+h+=`<div class="crd"><span class="lbl">Voci preventivo</span><div id="quoteLines">`;
+quoteLines.forEach((l,i)=>{h+=`<div class="quote-line"><input class="inp" placeholder="Descrizione" value="${esc(l.desc)}" oninput="quoteLines[${i}].desc=this.value" style="flex:2"><input class="inp" placeholder="Q.tà" value="${l.qty}" oninput="quoteLines[${i}].qty=this.value" style="width:50px;flex:0"><input class="inp" placeholder="€" value="${l.price}" oninput="quoteLines[${i}].price=this.value" style="width:70px;flex:0"><button class="ql-del" onclick="quoteLines.splice(${i},1);if(!quoteLines.length)quoteLines=[{desc:'',qty:'1',price:''}];buildQuote()">✕</button></div>`});
+h+=`</div><button class="btn2" onclick="quoteLines.push({desc:'',qty:'1',price:''});buildQuote()" style="margin-top:8px;width:100%">+ Aggiungi voce</button></div>`;
+h+=`<div class="crd"><span class="lbl">Note (opzionale)</span><textarea class="inp" id="quoteNote" placeholder="Condizioni, tempistiche..."></textarea></div>`;
+h+=`<div id="quoteResult" style="margin-top:8px"></div>`;
+document.getElementById(‘quoteBody’).innerHTML=h}
+async function genQuote(){const cl=document.getElementById(‘quoteClient’).value;const note=document.getElementById(‘quoteNote’).value;
+const lines=quoteLines.filter(l=>l.desc.trim());if(!lines.length){alert(‘Aggiungi almeno una voce’);return}
+document.getElementById(‘quoteBtn’).disabled=true;document.getElementById(‘quoteBtn’).textContent=‘⏳ Claude sta generando…’;
+const total=lines.reduce((s,l)=>{const p=parseFloat(l.price)||0;const q=parseInt(l.qty)||1;return s+p*q},0);
+const prompt=`Genera un preventivo professionale per ANYBYTE SRL (MSP/cybersecurity) per il cliente "${cl||'Da definire'}". Voci: ${lines.map(l=>`${l.desc} (q.tà ${l.qty}, €${l.price||‘da definire’})`).join('; ')}. Totale stimato: €${total.toFixed(2)}. ${note?'Note: '+note:''} Formatta in modo professionale con intestazione, voci numerate, totale, condizioni standard (validità 30gg, pagamento 30gg DFFM). In italiano.`;
+try{const r=await fetch(W,{method:‘POST’,headers:{‘Content-Type’:‘application/json’},body:JSON.stringify({pin:sessionStorage.getItem(‘pin’),action:‘quote’,prompt:prompt})});
+const data=await r.json();
+let txt=data.quote||data.message||‘Preventivo generato’;
+document.getElementById(‘quoteResult’).innerHTML=`<div class="crd"><span class="lbl">Preventivo generato</span><div style="font-size:13px;line-height:1.6;white-space:pre-wrap">${esc(txt)}</div><button class="btn" onclick="navigator.clipboard.writeText(this.previousElementSibling.textContent).then(()=>{this.textContent='✓ Copiato!';setTimeout(()=>this.textContent='📋 Copia preventivo',2e3)})" style="margin-top:8px;padding:8px;font-size:12px">📋 Copia preventivo</button></div>`}
+catch(e){document.getElementById(‘quoteResult’).innerHTML=`<div class="crd" style="border-color:var(--er)">Errore nella generazione. Il workflow n8n per i preventivi deve essere configurato.</div>`}
+document.getElementById(‘quoteBtn’).disabled=false;document.getElementById(‘quoteBtn’).textContent=‘Genera Preventivo con Claude’}
+
+function esc(s){if(!s)return’’;return String(s).replace(/&/g,’&’).replace(/</g,’<’).replace(/>/g,’>’).replace(/”/g,’"’)}
+
+// INIT
+if(sessionStorage.getItem(‘pin’)){pin=sessionStorage.getItem(‘pin’);init()}
 </script>
+
 </body>
 </html>
