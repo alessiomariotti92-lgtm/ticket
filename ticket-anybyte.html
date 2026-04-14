@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ANYBYTE Ticket">
+<title>Crea Ticket ANYBYTE</title>
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj48cmVjdCB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgcng9IjQwIiBmaWxsPSIjMkI3RkU4Ii8+PHRleHQgeD0iOTAiIHk9IjEwNSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjcwIiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkFCPC90ZXh0Pjwvc3ZnPg==">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --navy: #2B7FE8;
+    --cyan: #00C2FF;
+    --dark: #1a1f2e;
+    --card: #232838;
+    --border: #2e3446;
+    --text: #e8ecf4;
+    --muted: #8892a6;
+    --success: #34d399;
+    --error: #f87171;
+  }
+
+  body {
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    background: var(--dark);
+    color: var(--text);
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom) 16px;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 0 16px;
+  }
+
+  .logo {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--navy), var(--cyan));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px; color: white;
+  }
+
+  .header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--text), var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .card label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 120px;
+    background: var(--dark);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    padding: 12px;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  textarea:focus {
+    border-color: var(--navy);
+  }
+
+  textarea::placeholder {
+    color: var(--muted);
+    opacity: 0.6;
+  }
+
+  .paste-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px;
+    margin-top: 8px;
+    background: rgba(43, 127, 232, 0.1);
+    border: 1px dashed var(--navy);
+    border-radius: 12px;
+    color: var(--navy);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .paste-btn:active {
+    background: rgba(43, 127, 232, 0.2);
+    transform: scale(0.98);
+  }
+
+  select {
+    width: 100%;
+    padding: 12px;
+    background: var(--dark);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    outline: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%238892a6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--navy), var(--cyan));
+    border: none;
+    border-radius: 14px;
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 4px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .submit-btn:active {
+    transform: scale(0.97);
+    opacity: 0.9;
+  }
+
+  .submit-btn:disabled {
+    opacity: 0.5;
+    transform: none;
+  }
+
+  .submit-btn .spinner {
+    display: none;
+    width: 20px; height: 20px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  .submit-btn.loading .label { display: none; }
+  .submit-btn.loading .spinner { display: inline-block; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .result {
+    display: none;
+    text-align: center;
+    padding: 24px 16px;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .result.show { display: block; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .result-icon {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 12px;
+    font-size: 28px;
+  }
+
+  .result-icon.success { background: rgba(52, 211, 153, 0.15); }
+  .result-icon.error { background: rgba(248, 113, 113, 0.15); }
+
+  .result h2 {
+    font-size: 18px;
+    margin-bottom: 4px;
+  }
+
+  .ticket-number {
+    font-size: 28px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--navy), var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 8px 0;
+  }
+
+  .result p {
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .reset-btn {
+    margin-top: 16px;
+    padding: 12px 32px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .form-section { flex: 1; }
+
+  .info-bar {
+    text-align: center;
+    padding: 12px 0;
+    font-size: 12px;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">AB</div>
+  <h1>Crea Ticket</h1>
+</div>
+
+<div class="form-section" id="formSection">
+  <div class="card">
+    <label>Messaggio WhatsApp</label>
+    <textarea id="msgText" placeholder="Incolla qui il messaggio copiato da WhatsApp..."></textarea>
+    <button class="paste-btn" onclick="pasteClipboard()">
+      📋 Incolla dagli appunti
+    </button>
+  </div>
+
+  <div class="card">
+    <label>Priorità</label>
+    <select id="priority">
+      <option value="low">🟢 Bassa</option>
+      <option value="medium" selected>🟡 Media</option>
+      <option value="high">🟠 Alta</option>
+      <option value="critical">🔴 Critica</option>
+    </select>
+  </div>
+
+  <button class="submit-btn" id="submitBtn" onclick="createTicket()">
+    <span class="label">Crea Ticket</span>
+    <span class="spinner"></span>
+  </button>
+</div>
+
+<div class="result" id="resultSection">
+  <div class="result-icon success" id="resultIcon">✓</div>
+  <h2 id="resultTitle">Ticket creato!</h2>
+  <div class="ticket-number" id="ticketNumber"></div>
+  <p id="resultMessage"></p>
+  <button class="reset-btn" onclick="resetForm()">Nuovo ticket</button>
+</div>
+
+<div class="info-bar">ANYBYTE SRL — AnyOps Ticket System</div>
+
+<script>
+  // ─── CONFIGURAZIONE ──────────────────────────────────
+  const WEBHOOK_URL = 'https://automation.anybyte.it/webhook/whatsapp-ticket';
+  // ─────────────────────────────────────────────────────
+
+  async function pasteClipboard() {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text) {
+        document.getElementById('msgText').value = text;
+      }
+    } catch (e) {
+      // Fallback: focus sulla textarea così l'utente può incollare manualmente
+      const ta = document.getElementById('msgText');
+      ta.focus();
+      ta.placeholder = 'Tieni premuto qui e scegli Incolla';
+    }
+  }
+
+  async function createTicket() {
+    const text = document.getElementById('msgText').value.trim();
+    const priority = document.getElementById('priority').value;
+
+    if (!text) {
+      shakeTextarea();
+      return;
+    }
+
+    const btn = document.getElementById('submitBtn');
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    try {
+      const response = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: text,
+          priority: priority
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success || data.ticket_number) {
+        showResult(
+          true,
+          'Ticket creato!',
+          data.ticket_number || '',
+          data.message || 'Il ticket è stato registrato su AnyOps'
+        );
+      } else {
+        showResult(
+          false,
+          'Errore',
+          '',
+          data.message || 'Non è stato possibile creare il ticket'
+        );
+      }
+    } catch (error) {
+      showResult(
+        false,
+        'Errore di connessione',
+        '',
+        'Controlla la connessione internet e riprova'
+      );
+    }
+
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }
+
+  function showResult(success, title, number, message) {
+    document.getElementById('formSection').style.display = 'none';
+
+    const icon = document.getElementById('resultIcon');
+    icon.className = 'result-icon ' + (success ? 'success' : 'error');
+    icon.textContent = success ? '✓' : '✗';
+
+    document.getElementById('resultTitle').textContent = title;
+    document.getElementById('ticketNumber').textContent = number;
+    document.getElementById('resultMessage').textContent = message;
+
+    const result = document.getElementById('resultSection');
+    result.classList.add('show');
+
+    // Vibrazione di feedback se disponibile
+    if (success && navigator.vibrate) {
+      navigator.vibrate(100);
+    }
+  }
+
+  function resetForm() {
+    document.getElementById('formSection').style.display = 'block';
+    document.getElementById('resultSection').classList.remove('show');
+    document.getElementById('msgText').value = '';
+    document.getElementById('priority').value = 'medium';
+  }
+
+  function shakeTextarea() {
+    const ta = document.getElementById('msgText');
+    ta.style.borderColor = 'var(--error)';
+    ta.style.animation = 'shake 0.4s ease';
+    ta.focus();
+    setTimeout(() => {
+      ta.style.borderColor = '';
+      ta.style.animation = '';
+    }, 500);
+  }
+
+  // Shake animation
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Auto-paste all'apertura se possibile
+  window.addEventListener('load', () => {
+    setTimeout(pasteClipboard, 300);
+  });
+</script>
+
+</body>
+</html>
